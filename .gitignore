@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+data/raw/*.csv
+data/processed/*.csv
+ml-service/artifacts/*.joblib
+ml-service/artifacts/*.json
+
+node_modules/
+.next/
