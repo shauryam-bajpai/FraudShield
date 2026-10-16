@@ -2,6 +2,7 @@ import sys
 import unittest
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 
@@ -12,6 +13,20 @@ from training.features import build_features  # noqa: E402
 
 
 class FeatureTests(unittest.TestCase):
+    @staticmethod
+    def transaction(**overrides):
+        transaction = {
+            "transaction_id": "tx_1",
+            "card_id": "card_1",
+            "timestamp": "2024-01-01T10:00:00Z",
+            "amount": 10,
+            "merchant_category": "groceries",
+            "country": "IN",
+            "home_country": "IN",
+        }
+        transaction.update(overrides)
+        return transaction
+
     def test_only_earlier_transactions_are_visible(self):
         transactions = pd.DataFrame(
             [
@@ -99,6 +114,30 @@ class FeatureTests(unittest.TestCase):
             original["card_mean_amount_7d"],
             after_adding_future["card_mean_amount_7d"],
         )
+
+    def test_missing_timestamp_is_rejected(self):
+        transactions = pd.DataFrame(
+            [self.transaction(timestamp=None)]
+        )
+
+        with self.assertRaisesRegex(ValueError, "missing values"):
+            build_features(transactions)
+
+    def test_non_finite_amount_is_rejected(self):
+        transactions = pd.DataFrame(
+            [self.transaction(amount=np.inf)]
+        )
+
+        with self.assertRaisesRegex(ValueError, "finite nonnegative"):
+            build_features(transactions)
+
+    def test_empty_input_is_rejected(self):
+        transactions = pd.DataFrame(
+            columns=list(self.transaction())
+        )
+
+        with self.assertRaisesRegex(ValueError, "At least one"):
+            build_features(transactions)
 
 
 if __name__ == "__main__":

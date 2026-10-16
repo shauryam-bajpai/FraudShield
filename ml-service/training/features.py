@@ -1,5 +1,6 @@
 from collections import defaultdict, deque
 
+import numpy as np
 import pandas as pd
 
 
@@ -37,6 +38,21 @@ def build_features(transactions: pd.DataFrame) -> pd.DataFrame:
     if missing:
         raise ValueError(f"Missing columns: {sorted(missing)}")
 
+    if transactions.empty:
+        raise ValueError("At least one transaction is required")
+
+    columns_with_missing_values = sorted(
+        column
+        for column in REQUIRED_COLUMNS
+        if transactions[column].isna().any()
+    )
+
+    if columns_with_missing_values:
+        raise ValueError(
+            "Required columns contain missing values: "
+            f"{columns_with_missing_values}"
+        )
+
     if transactions["transaction_id"].duplicated().any():
         raise ValueError("transaction_id values must be unique")
 
@@ -53,8 +69,8 @@ def build_features(transactions: pd.DataFrame) -> pd.DataFrame:
         errors="raise",
     )
 
-    if frame["amount"].isna().any() or (frame["amount"] < 0).any():
-        raise ValueError("amount must be a nonnegative number")
+    if not np.isfinite(frame["amount"]).all() or (frame["amount"] < 0).any():
+        raise ValueError("amount must be a finite nonnegative number")
 
     frame = frame.sort_values(
         ["timestamp", "transaction_id"],
