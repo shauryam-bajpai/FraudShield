@@ -7,7 +7,8 @@
                     "build":  "tsc",
                     "start":  "node dist/server.js",
                     "typecheck":  "tsc --noEmit",
-                    "migrate":  "tsx src/db/migrate.ts"
+                    "migrate":  "tsx src/db/migrate.ts",
+                    "setup:admin":  "tsx src/db/setup_admin.ts"
                 },
     "engines":  {
                     "node":  "\u003e=20"
