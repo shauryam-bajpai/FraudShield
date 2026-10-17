@@ -14,10 +14,14 @@ SUPPORTED_MODELS = {
 }
 
 
+class ModelConfigurationError(RuntimeError):
+    """Raised when the server selects an unsupported model."""
+
+
 @lru_cache(maxsize=2)
 def load_model(name: str):
     if name not in SUPPORTED_MODELS:
-        raise ValueError(f"Unsupported model: {name}")
+        raise ModelConfigurationError(f"Unsupported model: {name}")
 
     model_path = ARTIFACT_DIR / f"{name}.joblib"
     metrics_path = ARTIFACT_DIR / f"{name}_metrics.json"
