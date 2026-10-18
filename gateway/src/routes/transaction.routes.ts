@@ -7,6 +7,7 @@ import {
     scoreWithMlService,
     type TransactionForScoring,
 } from "../services/mlClient.service";
+import { startCaseWorkflow } from "../controllers/case.controller";
 
 export const transactionRouter = Router();
 
@@ -165,6 +166,20 @@ transactionRouter.post("/", async (req, res) => {
 
         await client.query("COMMIT");
 
+        let caseStatus: "open" | "pending_review" | null = null;
+
+        if (caseId) {
+            try {
+                const started = await startCaseWorkflow(caseId);
+                caseStatus = started.status;
+            } catch (error) {
+                // The transaction and case were committed successfully.
+                // POST /cases/:caseId/start can retry this workflow start.
+                console.error("Case workflow start failed:", error);
+                caseStatus = "open";
+            }
+        }
+
         res.status(201).json({
             transaction_id: input.transaction_id,
             risk_score: score.risk_score,
@@ -172,6 +187,7 @@ transactionRouter.post("/", async (req, res) => {
             model: score.model,
             flagged_for_review: score.flagged_for_review,
             case_id: caseId,
+            case_status: caseStatus,
         });
     } catch (error) {
         await client.query("ROLLBACK");

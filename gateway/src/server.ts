@@ -12,6 +12,7 @@ import {
 import { requireAuth } from "./middleware/jwtAuth";
 import { authRouter } from "./routes/auth.routes";
 import { transactionRouter } from "./routes/transaction.routes";
+import { caseRouter } from "./routes/case.routes";
 
 const app = express();
 
@@ -54,6 +55,10 @@ app.use(
     requireAuth,
     transactionRouter
 );
+
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/transactions", requireAuth, transactionRouter);
+app.use("/api/v1/cases", requireAuth, caseRouter);
 
 app.use(notFound);
 app.use(errorHandler);
