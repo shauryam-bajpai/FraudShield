@@ -9,6 +9,8 @@ import {
 import { BrandMark } from "../components/BrandMark";
 import { MetricCard } from "../components/MetricCard";
 import { StatusBadge } from "../components/StatusBadge";
+import Link from "next/link";
+
 
 const API =
     process.env.NEXT_PUBLIC_GATEWAY_URL ??
