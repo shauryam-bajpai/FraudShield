@@ -1,4 +1,4 @@
-import json
+﻿import json
 from pathlib import Path
 
 import joblib
@@ -18,6 +18,10 @@ from features import (
     NUMERIC_FEATURES,
 )
 from train_baseline import evaluate
+try:
+    from validation import save_validation_predictions
+except ImportError:
+    from training.validation import save_validation_predictions
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -115,6 +119,13 @@ def main():
             threshold,
         ),
     }
+    save_validation_predictions(
+        model_name="xgboost",
+        transaction_ids=validation["transaction_id"],
+        labels=validation["is_fraud"],
+        scores=validation_probabilities,
+        path=ARTIFACT_DIR / "validation_predictions.csv",
+    )
 
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
 
