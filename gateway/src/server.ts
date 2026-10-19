@@ -11,8 +11,9 @@ import {
 } from "./middleware/errorHandler";
 import { requireAuth } from "./middleware/jwtAuth";
 import { authRouter } from "./routes/auth.routes";
-import { transactionRouter } from "./routes/transaction.routes";
 import { caseRouter } from "./routes/case.routes";
+import { insightsRouter } from "./routes/insights.routes";
+import { transactionRouter } from "./routes/transaction.routes";
 
 const app = express();
 
@@ -49,15 +50,9 @@ app.get("/api/v1/health", (_req, res) => {
 });
 
 app.use("/api/v1/auth", authRouter);
-app.use(
-    "/api/v1/transactions",
-    requireAuth,
-    transactionRouter
-);
-
-app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/transactions", requireAuth, transactionRouter);
 app.use("/api/v1/cases", requireAuth, caseRouter);
+app.use("/api/v1/insights", requireAuth, insightsRouter);
 
 app.use(notFound);
 app.use(errorHandler);
