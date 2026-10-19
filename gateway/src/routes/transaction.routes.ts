@@ -1,4 +1,4 @@
-import { Router } from "express";
+﻿import { Router } from "express";
 import { z } from "zod";
 
 import { db } from "../config/db";
@@ -166,7 +166,7 @@ transactionRouter.post("/", async (req, res) => {
 
         await client.query("COMMIT");
 
-        let caseStatus: "open" | "pending_review" | null = null;
+        let caseStatus: "open" | "pending_review" | "resolved" | null = null;
 
         if (caseId) {
             try {
